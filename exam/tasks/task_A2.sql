@@ -4,15 +4,14 @@
 
 WITH cancelled_boeing_flights AS (
     SELECT
-        f.flight_id,
-        f.aircraft_code
+        f.flight_id
     FROM
         flights f
     JOIN
         aircrafts_data a ON f.aircraft_code = a.aircraft_code
     WHERE
         f.status = 'Cancelled'
-        AND a.model->>'manufacturer' = 'Boeing'
+        AND a.model->>'en' LIKE 'Boeing%'
         AND EXTRACT(MONTH FROM f.scheduled_departure) = 7
 ), passengers_contact_data AS (
     SELECT
