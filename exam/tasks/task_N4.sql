@@ -18,3 +18,6 @@ BEGIN
 END;
 $$;
 
+// Вызов функции:
+
+CALL update_delayed_flights('2024-06-01');
