@@ -1,23 +1,34 @@
-// 1. Найти рейсы, которые были отменены в июле.
-// 2. Найти информацию о пассажирах, которые были забронированы на этих рейсах.
-// 3. Получить контактные данные этих пассажиров.
+// Для написания запроса на основе CTE, который выводит контактные данные
+// пассажиров рейсов на боингах, отмененных в июле,
+// мы можем использовать соединения таблиц и фильтрацию по условию.
 
-WITH cancelled_july_flights AS (
-    SELECT flight_id
-    FROM flights
-    WHERE status = 'cancelled'
-      AND EXTRACT(MONTH FROM scheduled_departure) = 7
-      AND EXTRACT(YEAR FROM scheduled_departure) = EXTRACT(YEAR FROM CURRENT_DATE)
-      AND aircraft_code IN (
-          SELECT aircraft_code
-          FROM aircrafts_data
-          WHERE model @> '{"manufacturer": "Boeing"}'
-      )
-), passenger_contacts AS (
-    SELECT tf.ticket_no, t.passenger_name, t.contact_data
-    FROM ticket_flights tf
-    JOIN tickets t ON tf.ticket_no = t.ticket_no
-    WHERE tf.flight_id IN (SELECT flight_id FROM cancelled_july_flights)
+WITH cancelled_boeing_flights AS (
+    SELECT
+        f.flight_id,
+        f.aircraft_code
+    FROM
+        flights f
+    JOIN
+        aircrafts_data a ON f.aircraft_code = a.aircraft_code
+    WHERE
+        f.status = 'Cancelled'
+        AND a.model->>'manufacturer' = 'Boeing'
+        AND EXTRACT(MONTH FROM f.scheduled_departure) = 7
+), passengers_contact_data AS (
+    SELECT
+        t.passenger_id,
+        t.passenger_name,
+        t.contact_data
+    FROM
+        tickets t
+    JOIN
+        ticket_flights tf ON t.ticket_no = tf.ticket_no
+    JOIN
+        cancelled_boeing_flights cbf ON tf.flight_id = cbf.flight_id
 )
-SELECT passenger_name, contact_data
-FROM passenger_contacts;
+SELECT
+    passenger_id,
+    passenger_name,
+    contact_data
+FROM
+    passengers_contact_data;
