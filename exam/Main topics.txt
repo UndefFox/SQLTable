@@ -1,0 +1,16 @@
+Подзапросы 
+https://sql-academy.org/ru/guide/nested-sql-queries
+
+JOIN 
+https://sql-academy.org/ru/guide/multi-table-request-join
+
+CTE
+https://sql-academy.org/ru/guide/operator-with#obobshyonnoe-tablichnoe-vyrazhenie-operator-with
+https://learndb.ru/articles/article/88
+CTE (по-человечески WITH)
+- общее табличное выражение
+- Упрощает читабельность кода
+
+Оконные функции 
+https://sql-academy.org/ru/guide/windows-functions 
+Оконная функция - работает с выделенным набором строк и выполняет вычисление для этого набора строк в отдельном столбце 
