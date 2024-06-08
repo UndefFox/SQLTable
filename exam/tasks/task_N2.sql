@@ -1,28 +1,38 @@
-// Чтобы вычислить отклонение стоимости каждого
-// билета от средней стоимости всех билетов, можно использовать Common Table Expression (CTE) вместе
-// с оконной функцией для вычисления средней стоимости билетов
+// 1. Найти самый северный аэропорт.
+// 2. Найти рейсы, которые прилетали в этот аэропорт.
+// 3. Найти пассажиров, которые летали на этих рейсах.
 
-WITH ticket_prices AS (
+WITH northernmost_airport AS (
     SELECT
-        ticket_no,
-        SUM(amount) AS total_amount
+        airport_code
     FROM
-        ticket_flights
-    GROUP BY
-        ticket_no
-), average_price AS (
+        airports_data
+    ORDER BY
+        coordinates[1] DESC -- Assuming the point is stored as (latitude, longitude)
+    LIMIT 1
+), flights_to_northernmost_airport AS (
     SELECT
-        AVG(total_amount) AS avg_amount
+        flight_id
     FROM
-        ticket_prices
+        flights
+    WHERE
+        arrival_airport = (SELECT airport_code FROM northernmost_airport)
+), passengers_on_northern_flights AS (
+    SELECT
+        tf.ticket_no,
+        t.passenger_id,
+        t.passenger_name,
+        t.contact_data
+    FROM
+        ticket_flights tf
+    JOIN
+        tickets t ON tf.ticket_no = t.ticket_no
+    WHERE
+        tf.flight_id IN (SELECT flight_id FROM flights_to_northernmost_airport)
 )
 SELECT
-    tp.ticket_no,
-    tp.total_amount,
-    ap.avg_amount,
-    tp.total_amount - ap.avg_amount AS deviation
+    passenger_id,
+    passenger_name,
+    contact_data
 FROM
-    ticket_prices tp,
-    average_price ap
-ORDER BY
-    deviation DESC;
+    passengers_on_northern_flights;

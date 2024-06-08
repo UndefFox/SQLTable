@@ -12,3 +12,8 @@ BEGIN
     WHERE aircraft_code = p_aircraft_code;
 END;
 $$;
+
+
+// Вызов процедуры
+
+CALL cancel_flights_by_aircraft('ABC');
